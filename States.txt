@@ -1,0 +1,28 @@
+1 - u
+2 - v 
+3 - w
+
+4 - P 
+5 - Q
+6 - R
+
+7 - pitch
+8 - roll
+9 - Yaw
+10 - Z
+
+(yaw vai de cona) ficam 9 estados
+Longitudinal
+
+Lateral 
+1 - u
+3 - w
+5 - Q
+7 - Pitch
+9 - Z (10 - Z)
+
+2 - v 
+4 - P
+6 - R
+8 - Roll
+(9 - yaw)

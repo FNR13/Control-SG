@@ -1,0 +1,22 @@
+Design MPC Controller in Simulink - https://www.mathworks.com/help/mpc/gs/designing-a-model-predictive-controller-for-a-simulink-plant.html
+
+
+mpc function - https://www.mathworks.com/help/mpc/ref/mpc.html
+
+
+MPC Designer - https://www.mathworks.com/help/mpc/ref/mpcdesigner-app.html
+
+
+MPC Prediction Models - https://www.mathworks.com/help/mpc/gs/mpc-modeling.html
+
+
+Construct Linear Time Invariant Models - https://www.mathworks.com/help/mpc/gs/linear-time-invariant-lti-models.html
+
+
+MPC Controller - https://www.mathworks.com/help/releases/R2024a/mpc/ref/mpccontroller.html
+
+
+How to Design a Model Predictive Control Controller with Simulink video - https://www.youtube.com/watch?v=evyvdvApPLY&t=279s
+
+mpcstate - 
+https://www.mathworks.com/help/mpc/ref/mpcstate.html
