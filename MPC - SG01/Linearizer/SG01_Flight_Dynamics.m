@@ -1,4 +1,4 @@
-function [u_dot,v_dot,w_dot,p_dot,q_dot,r_dot,Pitch_dot,Roll_dot,Yaw_dot,Z_dot,Torque,Rpms_motor] = SG01_Flight_Dynamics(Act_Ailerons,Act_Rear,Rudder,Rpms_motor,u,v,w,wponto,p,q,r,Pitch,Roll,Yaw,z_cm,struts)
+function [u_dot,v_dot,w_dot,p_dot,q_dot,r_dot,Pitch_dot,Roll_dot,Yaw_dot,Z_dot,Torque,Rpms_motor] = SG01_Flight_Dynamics(Act_Ailerons,Act_Rear,Rpms_motor,Rudder,u,v,w,p,q,r,Pitch,Roll,Yaw,z_cm)
 
 % Modelo Dinâmico do SG01, recebendo o estado do sistema ele retorna as
 % derivadas das velocidades da "embarcação"
@@ -17,6 +17,9 @@ b = 2.400; % Span da Asa
 c = 0.30988; % Corda média da Asa
 S = 0.68757769; % Área da Asa
 S_t = 0.20158673; % Área Elevator
+
+struts = 1;
+wponto = 0;
 
 if struts == 1 % struts estendidas, distancia submersa de strut
     z_struts = 1360 - z_cm/10; % estimativa muito rough
@@ -159,19 +162,50 @@ Nd_r = 0.5*rho*u0*u0*S*beta*CNd_r;
 Rpms_propeller = Rpms_motor/3;
 diam = 0.335;
 
-% Read the table from the file
-dados_prop = readtable('Props', 'Delimiter', ';');
+% Coefficients for KT 
+KT_p1 = -39.575;
+KT_p2 = 296.698;
+KT_p3 = -977.420;
+KT_p4 = 1855.793;
+KT_p5 = -2236.302;
+KT_p6 = 1772.128;
+KT_p7 = -922.459;
+KT_p8 = 303.597;
+KT_p9 = -57.450;
+KT_p10 = 5.070;
 
-% Extract the numerical data from the table
-Js = table2array(dados_prop(2:end, 1));   % Js values
-Kqs = table2array(dados_prop(2:end, 2));  % Kqs values
-KTs = table2array(dados_prop(2:end, 3));  % KTs values
-Effs = table2array(dados_prop(2:end, 4)); % Efficiency values
+% KT function 
+KT = @(x) KT_p1*x.^9 + KT_p2*x.^8 + KT_p3*x.^7 + KT_p4*x.^6 + KT_p5*x.^5 + KT_p6*x.^4 + KT_p7*x.^3 + KT_p8*x.^2 + KT_p9*x + KT_p10;
 
-% Fit a ninth-degree polynomial model to Kq and KT, and a second-degree polynomial to Efficiency
-Kq = fit(Js, Kqs, 'poly9');
-KT = fit(Js, KTs, 'poly9');
-Eff = fit(Js, Effs, 'poly9');
+ 
+% Coefficients for kq 
+Kq_p1 = 2.787;
+Kq_p2 = -23.468;
+Kq_p3 = 85.726;
+Kq_p4 = -178.762;
+Kq_p5 = 234.931;
+Kq_p6 = -202.035;
+Kq_p7 = 113.776;
+Kq_p8 = -40.505;
+Kq_p9 = 8.257;
+Kq_p10 = -0.689;
+
+% Kq function 
+Kq = @(x) Kq_p1*x.^9 + Kq_p2*x.^8 + Kq_p3*x.^7 + Kq_p4*x.^6 + Kq_p5*x.^5 + Kq_p6*x.^4 + Kq_p7*x.^3 + Kq_p8*x.^2 + Kq_p9*x + Kq_p10;
+
+ 
+Eff_p1 = -8627.603;
+Eff_p2 = 61047.137;
+Eff_p3 = -190004.846;
+Eff_p4 = 341275.624;
+Eff_p5 = -389694.485;
+Eff_p6 = 293275.527;
+Eff_p7 = -145425.792;
+Eff_p8 = 45806.430;
+Eff_p9 = -8313.959;
+Eff_p10 = 662.694;
+% Eff function 
+Eff = @(x) Eff_p1*x.^9 + Eff_p2*x.^8 + Eff_p3*x.^7 + Eff_p4*x.^6 + Eff_p5*x.^5 + Eff_p6*x.^4 + Eff_p7*x.^3 + Eff_p8*x.^2 + Eff_p9*x + Eff_p10;
 
 js = 60*V/(Rpms_propeller*diam);
 
@@ -254,8 +288,5 @@ w_dot = uvw_dot(3);
 
 Z_dot = VI_dot(3);
 
-% disp(Tau);
-% disp(F);
 
-% fprintf("%f %f %f %f %f %f %f %f %f %f %f %f",u_dot,v_dot,w_dot,p_dot,q_dot,r_dot,Pitch_dot,Roll_dot,Yaw_dot,Z_dot,Torque,Rpms_motor)
 end

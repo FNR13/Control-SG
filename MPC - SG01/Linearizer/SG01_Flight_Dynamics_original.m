@@ -17,15 +17,6 @@ b = 2.400; % Span da Asa
 c = 0.30988; % Corda média da Asa
 S = 0.68757769; % Área da Asa
 S_t = 0.20158673; % Área Elevator
-%dist_US_A_quilha = 650; %mm
-%dist_US_B_quilha = 650; %mm
-%dist_US_C_quilha = 600; %mm
-%dist_US_D_quilha = 600; %mm  é para futuramente incluir o barco em voo e em
-                                %não voo mas estes dados estão errados
-%dist_US_E_quilha = 550; %mm
-%dist_US_F_quilha = 550; %mm
-%dist_US_G_quilha = 550; %mm
-%dist_US_H_quilha = 550; %mm
 
 if struts == 1 % struts estendidas, distancia submersa de strut
     z_struts = 1360 - z_cm/10; % estimativa muito rough
@@ -43,32 +34,34 @@ dist_CGSG_CGASAS_Y = 0; %idealmente
 dist_CGSG_CGASAS_Z = z_struts + 1;
 
 %%% Derivadas de estabilidade e controlo %%%
-u0 = 10.293;
-teta0 = -1.34;
+u0 = 10.285;
+deltau = u - u0;
+deltaAct_Rear = 2.35 - Act_Rear;
+teta0 = -1.31;
 Cw0 = (m*g*cos(teta0))/(0.5*rho*(u0^2)*S);
-Cd1 = 0.017;
+Cd1 = 0.018;
 
-CXu = -0.03369;
-CZu = 0.00169;
-CMu = 0.08612;
-CXa = 0.30342;
-CLa = 5.65161;
-CMa = -7.82166;
+CXu = -0.03380;
+CZu = -0.00166;
+CMu = 0.09677;
+CXa = 0.30449;
+CLa = 5.65160;
+CMa = -7.48898;
 CXwponto = 0;
 CLwponto = 0; % Não tenho como saber ainda
 CMwponto = 0;
-CXq = -1.05450;
-CLq = 52.07986;
-CMq = -343.41152;
-CYb = -0.11321;
-Clb = 0.09773;
-CNb = 0.17211;
-CYp = 0.17771;
-Clp = -0.69248;
-CNp = -0.38592;
-CYr = 0.35202;
-Clr = -0.16236;
-CNr = -0.52919;
+CXq = -1.10793;
+CLq = 54.02705;
+CMq = -344.98052;
+CYb = -0.11416;
+Clb = 0.10998;
+CNb = 0.17299;
+CYp = 0.20362;
+Clp = -0.74092;
+CNp = -0.42465;
+CYr = 0.35551;
+Clr = -0.20002;
+CNr = -0.53258;
 CXd_a = -0.00519;
 CYd_a = 0;
 CZd_a = 0.00046;
@@ -76,11 +69,11 @@ Cld_a = 0.33103;
 CMd_a = 0.00124;
 CNd_a = 0.02907;
 CXd_t = -0.03699;
-CYd_t = 0.00003;
+CYd_t = 0.00000; % meti a 0 porque não faz sentido
 CZd_t = -1.21190;
-Cld_t = -0.00001;
+Cld_t = 0;
 CMd_t = -14.27522;
-CNd_t = -0.00001;
+CNd_t = 0;
 CXd_r = -0.00023;
 CYd_r = 0.09253;
 CZd_r = 0.00011;
@@ -195,11 +188,13 @@ Torque=P_mec/(Rpms_motor*2*pi/60);
 
 %%% SOMATÓRIO %%%
 
-X = du(1)*u + dw(1)*w + dwponto(1)*wponto + dq(1)*q + Xd_a*Act_Ailerons + Xd_t*Act_Rear + Xd_r*Rudder;
+X = du(1)*deltau + dw(1)*w + dwponto(1)*wponto + dq(1)*q + Xd_a*Act_Ailerons + Xd_t*deltaAct_Rear + Xd_r*Rudder;
 Y = dv(1)*v + dp(1)*p + dr(1)*r + Yd_a*Act_Ailerons + Yd_t*Act_Rear + Yd_r*Rudder;
-Z = du(2)*u + dw(2)*w + dwponto(2)*wponto + dq(2)*q + Zd_a*Act_Ailerons + Zd_t*Act_Rear + Zd_r*Rudder;
+Z = du(2)*deltau + dw(2)*w + dwponto(2)*wponto + dq(2)*q + Zd_a*Act_Ailerons + Zd_t*deltaAct_Rear + Zd_r*Rudder;
+fprintf("COMPONENTE Z %f %f %f %f %f %f %f\n",du(2)*deltau,dw(2)*w,dwponto(2)*wponto,dq(2)*q,Zd_a*Act_Ailerons,Zd_t*deltaAct_Rear,Zd_r*Rudder);
 L = dv(2)*v + dp(2)*p + dr(2)*r + Ld_a*Act_Ailerons + Ld_t*Act_Rear + Ld_r*Rudder;
-M = du(3)*u + dw(3)*w + dwponto(3)*wponto + dq(3)*q + Md_a*Act_Ailerons + Md_t*Act_Rear + Md_r*Rudder;
+M = du(3)*deltau + dw(3)*w + dwponto(3)*wponto + dq(3)*q + Md_a*Act_Ailerons + Md_t*deltaAct_Rear + Md_r*Rudder;
+fprintf("COMPONENTES M %f %f %f %f %f %f %f\n",du(3)*deltau,dw(3)*w,dwponto(3)*wponto,dq(3)*q,Md_a*Act_Ailerons,Md_t*deltaAct_Rear,Md_r*Rudder);
 N = dv(3)*v + dp(3)*p + dr(3)*r + Nd_a*Act_Ailerons + Nd_t*Act_Rear + Nd_r*Rudder;
 
 %d = [dist_CGSG_CGASAS_X ; dist_CGSG_CGASAS_Y ; dist_CGSG_CGASAS_Z];
@@ -208,8 +203,8 @@ F = [X + T ; Y ; Z];
 
 M_2 = [L ; M ; N];
 
-M_T = [0 ; 2.6 * T ; 0]; % Momento só do Thrust, confia
-
+M_T = [0 ; 2.6 * T; 0]; % Momento só do Thrust, confia
+fprintf("thrust %f",2.6*T);
 Tau = M_2 + M_T; % Momentos livres + Momentos das Forças no CG do SG
 
 
@@ -225,10 +220,10 @@ q = q*pi/180;
 r = r*pi/180;
 ww = [p;q;r];
 
-W_inertial = m*g*[0;0;1];
+%W_inertial = m*g*[0;0;1];
+W_inertial = 0;
 
 uvw_dot = (F + R*W_inertial)/m - cross(ww, [u;v;w]);
-
 VI_dot = R'*[u;v;w];
 
 %Inertial angular velocities
@@ -263,7 +258,6 @@ Z_dot = VI_dot(3);
 
 disp(Tau);
 disp(F);
-disp(T);
 
 fprintf("%f %f %f %f %f %f %f %f %f %f %f %f",u_dot,v_dot,w_dot,p_dot,q_dot,r_dot,Pitch_dot,Roll_dot,Yaw_dot,Z_dot,Torque,Rpms_motor)
 end

@@ -28,6 +28,7 @@ io = getlinio(model);
 
 %now specify the ouputs of the linearized model
 % io(size(io,1)+1) = linio('SG_model/aUSPEED',1,'output');
+% io(size(io,1)+1) = linio('SG_model/gPitch',1,'output');
 io(size(io,1)+1) = linio('SG_model/hRoll',1,'output');
 io(size(io,1)+1) = linio('SG_model/jZ',1,'output');
 
@@ -38,6 +39,7 @@ B = lin_model.B;
 C = lin_model.C;
 D = lin_model.D;
 
+% save('linear_model_p.mat','lin_model_p','initial_uspeed')
 save('linear_model.mat','lin_model','initial_uspeed')
 
 % Controlability: rank must be equal to dim of model

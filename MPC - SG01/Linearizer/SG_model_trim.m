@@ -6,6 +6,7 @@ clear
 %open the 'SG_model' and set all 4 inputs as inputs with the manual
 %switches
 
+% Not implemented:
 % too have free rear foil put -10 as input;
 % too have free thrust put 0 as input;
 
@@ -13,12 +14,14 @@ clear
 
 initial_uspeed = 10.285;
 initial_Z = -50;
-initial_Pitch = -1.31;
+initial_Pitch = 0;
 
 foilborn = 1;
-Rpms_motor = 4650;
-rear = 2.35;
+
 aileron = 0;
+rear = 2.35;
+Rpms_motor = 4651.4;
+rudder = 0;
 
 % wait bar
 f = uifigure('Name','Wait','Position',[200 200 425 275]);
@@ -35,8 +38,8 @@ max_ailerons = 15;
 minAOA_rear = -3; 
 maxAOA_rear = 15; 
 minRpms_motor = 0;
-maxRpms_motor = 10000; %max rpms
-minGG = -15; % Rudder angle
+maxRpms_motor = 10000; 
+minGG = -15;
 maxGG = 15;
 
 minU = 0;
@@ -48,14 +51,16 @@ maxW = 5;
 
 minPITCH = -5;
 maxPITCH = 5;
+minROLL = -10;
+maxROLL = 10;
 minYAW = -50000;
 maxYAW = 50000;
 
-minZ = -1000;
-maxZ = 1000;
+minZ = -200;
+maxZ = 0;
 
-% Rpms_motor = 1000*initial_uspeed;
-
+% For when triming around other velocities
+% Rpms_motor = 5000*initial_uspeed;
 
 % if initial_Z == -0.2
 %     foilborn = 0;
@@ -77,7 +82,7 @@ maxZ = 1000;
 
 %% Set initial conditions
 x0 = [initial_uspeed; 0;0;0;0;0;initial_Pitch;0;0; initial_Z];
-u0 = [aileron; rear; Rpms_motor;0];
+u0 = [aileron; rear; Rpms_motor;rudder];
 y0 = [0 0 0 0 0 0 0 0];
 % create constants for simulink model
 assignin('base','initial_uspeed',x0(1));
@@ -93,10 +98,6 @@ assignin('base','initial_ROLL',x0(8));
 assignin('base','initial_YAW',x0(9));
 
 assignin('base','initial_Z',x0(10));
-
-%% Set the constraints on the states in the model.
-% - The defaults for all states are Known = false, SteadyState = true,
-%   Min = -Inf, Max = Inf, dxMin = -Inf, and dxMax = Inf.
 
 
 %% Create the operating point specification object.
@@ -120,18 +121,18 @@ for i=1:(length(opspec.States))
 end
 
 % Longitudinal
-opspec.States(1).SteadyState = 1;
-opspec.States(3).SteadyState = 1;
-opspec.States(5).SteadyState = 1;
-opspec.States(7).SteadyState = 1;
-opspec.States(10).SteadyState = 0;
+opspec.States(1).SteadyState = 1; % u
+opspec.States(3).SteadyState = 1; % w
+opspec.States(5).SteadyState = 1; % Q 
+opspec.States(7).SteadyState = 1; % Pitch
+opspec.States(10).SteadyState = 1; % Z 
 
 % Lateral
-opspec.States(2).SteadyState = 0;
-opspec.States(4).SteadyState = 0;
-opspec.States(6).SteadyState = 0;
-opspec.States(8).SteadyState = 0;
-opspec.States(9).SteadyState = 1;
+opspec.States(2).SteadyState = 0; % v
+opspec.States(4).SteadyState = 0; % P
+opspec.States(6).SteadyState = 0; % R 
+opspec.States(8).SteadyState = 1; % Roll
+opspec.States(9).SteadyState = 1; % Yaw
 
 %% Set the constraints on the inputs in the model.
 % - The defaults for all inputs are Known = false, Min = -Inf, and
@@ -141,10 +142,10 @@ for i=1:length(opspec.inputs)
     opspec.Inputs(i).u = u0(i);
 end
 
-opspec.Inputs(1).known = 1;
-opspec.Inputs(2).known = 0;
-opspec.Inputs(3).known = 0;
-opspec.Inputs(4).known = 1;
+opspec.Inputs(1).known = 1; % Ailerons
+opspec.Inputs(2).known = 0; % Rear Foil
+opspec.Inputs(3).known = 0; % RPMS
+opspec.Inputs(4).known = 1; % Rudder
 
 %% set the max and mins
 
@@ -176,6 +177,10 @@ opspec.States(3).Max = maxW;
 % States (7) - SG_model/pitch
 opspec.States(7).Min = minPITCH;
 opspec.States(7).Max = maxPITCH;
+
+% States (8) - SG_model/Roll
+opspec.States(8).Min = minROLL;
+opspec.States(8).Max = maxROLL;
 
 % States (9) - SG_model/yaw
 opspec.States(9).Min = minYAW;
