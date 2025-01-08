@@ -40,7 +40,7 @@ C = lin_model.C;
 D = lin_model.D;
 
 % save('linear_model_p.mat','lin_model_p','initial_uspeed')
-save('linear_model.mat','lin_model','initial_uspeed')
+save('MatFiles/linear_model.mat','lin_model','initial_uspeed')
 
 % Controlability: rank must be equal to dim of model
 Co = ctrb(lin_model);
