@@ -14,7 +14,7 @@ clear
 
 initial_uspeed = 10.285;
 initial_Z = -50;
-initial_Pitch = 0;
+initial_Pitch = -1.31;
 
 foilborn = 1;
 
@@ -122,9 +122,15 @@ end
 
 % Longitudinal
 opspec.States(1).SteadyState = 1; % u
+
+opspec.States(3).Known = 1; 
 opspec.States(3).SteadyState = 1; % w
+
 opspec.States(5).SteadyState = 1; % Q 
-opspec.States(7).SteadyState = 1; % Pitch
+
+opspec.States(7).SteadyState = 0; % Pitch
+opspec.States(7).Known = 0; % Pitch
+
 opspec.States(10).SteadyState = 1; % Z 
 
 % Lateral

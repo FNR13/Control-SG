@@ -37,8 +37,11 @@ dist_CGSG_CGASAS_Y = 0; %idealmente
 dist_CGSG_CGASAS_Z = z_struts + 1;
 
 %%% Derivadas de estabilidade e controlo %%%
-u0 = 10.285;
+V0 = 10.285;
+u0 = cos(deg2rad(-1.31))*V0;
+w0 = sin(deg2rad(-1.31))*V0;
 deltau = u - u0;
+deltaw = w - w0;
 deltaAct_Rear = 2.35 - Act_Rear;
 teta0 = -1.31;
 Cw0 = (m*g*cos(teta0))/(0.5*rho*(u0^2)*S);
@@ -72,11 +75,11 @@ Cld_a = 0.33103;
 CMd_a = 0.00124;
 CNd_a = 0.02907;
 CXd_t = -0.03699;
-CYd_t = 0.00003;
+CYd_t = 0; % meti a 0 porque não faz sentido
 CZd_t = -1.21190;
-Cld_t = -0.00001;
+Cld_t = 0;
 CMd_t = -14.27522;
-CNd_t = -0.00001;
+CNd_t = 0;
 CXd_r = -0.00023;
 CYd_r = 0.09253;
 CZd_r = 0.00011;
@@ -85,7 +88,6 @@ CMd_r = 0.00146;
 CNd_r = -0.14062;
 
 %%% DERIVADAS DIMENSIONAIS DE ESTABILIDADE %%
-
 V = sqrt(u^2 + v^2 + w^2);
 beta = asin(u/V);
 alpha = atan(w/V);
@@ -176,7 +178,6 @@ KT_p10 = 5.070;
 
 % KT function 
 KT = @(x) KT_p1*x.^9 + KT_p2*x.^8 + KT_p3*x.^7 + KT_p4*x.^6 + KT_p5*x.^5 + KT_p6*x.^4 + KT_p7*x.^3 + KT_p8*x.^2 + KT_p9*x + KT_p10;
-
  
 % Coefficients for kq 
 Kq_p1 = 2.787;
@@ -193,7 +194,6 @@ Kq_p10 = -0.689;
 % Kq function 
 Kq = @(x) Kq_p1*x.^9 + Kq_p2*x.^8 + Kq_p3*x.^7 + Kq_p4*x.^6 + Kq_p5*x.^5 + Kq_p6*x.^4 + Kq_p7*x.^3 + Kq_p8*x.^2 + Kq_p9*x + Kq_p10;
 
- 
 Eff_p1 = -8627.603;
 Eff_p2 = 61047.137;
 Eff_p3 = -190004.846;
@@ -222,11 +222,11 @@ Torque=P_mec/(Rpms_motor*2*pi/60);
 
 %%% SOMATÓRIO %%%
 
-X = du(1)*deltau + dw(1)*w + dwponto(1)*wponto + dq(1)*q + Xd_a*Act_Ailerons + Xd_t*deltaAct_Rear + Xd_r*Rudder;
+X = du(1)*deltau + dw(1)*deltaw + dwponto(1)*wponto + dq(1)*q + Xd_a*Act_Ailerons + Xd_t*deltaAct_Rear + Xd_r*Rudder;
 Y = dv(1)*v + dp(1)*p + dr(1)*r + Yd_a*Act_Ailerons + Yd_t*Act_Rear + Yd_r*Rudder;
-Z = du(2)*deltau + dw(2)*w + dwponto(2)*wponto + dq(2)*q + Zd_a*Act_Ailerons + Zd_t*deltaAct_Rear + Zd_r*Rudder;
+Z = du(2)*deltau + dw(2)*deltaw + dwponto(2)*wponto + dq(2)*q + Zd_a*Act_Ailerons + Zd_t*deltaAct_Rear + Zd_r*Rudder;
 L = dv(2)*v + dp(2)*p + dr(2)*r + Ld_a*Act_Ailerons + Ld_t*Act_Rear + Ld_r*Rudder;
-M = du(3)*deltau + dw(3)*w + dwponto(3)*wponto + dq(3)*q + Md_a*Act_Ailerons + Md_t*deltaAct_Rear + Md_r*Rudder;
+M = du(3)*deltau + dw(3)*deltaw + dwponto(3)*wponto + dq(3)*q + Md_a*Act_Ailerons + Md_t*deltaAct_Rear + Md_r*Rudder;
 N = dv(3)*v + dp(3)*p + dr(3)*r + Nd_a*Act_Ailerons + Nd_t*Act_Rear + Nd_r*Rudder;
 
 %d = [dist_CGSG_CGASAS_X ; dist_CGSG_CGASAS_Y ; dist_CGSG_CGASAS_Z];
@@ -235,8 +235,7 @@ F = [X + T ; Y ; Z];
 
 M_2 = [L ; M ; N];
 
-M_T = [0 ; 2.6 * T ; 0]; % Momento só do Thrust, confia
-
+M_T = [0 ; 2.6 * T; 0]; % Momento só do Thrust, confia
 Tau = M_2 + M_T; % Momentos livres + Momentos das Forças no CG do SG
 
 
@@ -287,6 +286,5 @@ v_dot = uvw_dot(2);
 w_dot = uvw_dot(3);
 
 Z_dot = VI_dot(3);
-
 
 end

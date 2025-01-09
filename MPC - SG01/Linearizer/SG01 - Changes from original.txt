@@ -1,0 +1,6 @@
+ - Prop coeficients are explicit instead of calculated(prop calcl.m)
+
+ - w_ponto = 0;
+struts = 0
+
+ - changed order of rudder and rpms
