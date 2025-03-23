@@ -6,18 +6,22 @@ load linear_model.mat
 Ts = 0.020;
 discrete_model = c2d(lin_model,Ts);
 
+fprintf('// Define dynamics matrix \n')
 fprintf('Ad << ')
 printFormattedMatrix(discrete_model.A)
 fprintf('\n')
 
+fprintf('// Define inputs matrix \n')
 fprintf('Bd << ')
 printFormattedMatrix(discrete_model.B(:,1:2))
 fprintf('\n')
 
+fprintf('// Define Output matrix \n')
 fprintf('Cd << ')
 printFormattedMatrix(discrete_model.C)
 fprintf('\n')
 
+fprintf('// Define Disturbances matrix \n')
 fprintf('Bdd << ')
 printFormattedMatrix(discrete_model.B(:,3:4))
 

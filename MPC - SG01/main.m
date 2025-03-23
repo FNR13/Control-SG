@@ -7,7 +7,7 @@ clear
 
 
 load('controller.mat')
-load('controller_p.mat')
+% load('controller_p.mat')
 load('MatFiles/trim_op_fixed_v.mat');
 
 initial_Z = -50;

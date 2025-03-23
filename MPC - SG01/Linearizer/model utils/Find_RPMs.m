@@ -1,16 +1,17 @@
 Act_Ailerons = 0;
-Act_Rear = 2.35;
+Act_Rear = 4;
 Rudder = 0;
-u0 = 10.2823; w0 = -0.2351; p0 = 0; q0 = 0; r0 = 0;
-Pitch0 = -1.31; Roll0 = 0; Yaw0 = 0;
+Uinf = 10.28;
+Pitch0 = -3.558;
+u_0 = Uinf*cos(deg2rad(Pitch0)); w_0 = Uinf*sin(deg2rad(Pitch0)); p0 = 0; q0 = 0; r0 = 0;
+Roll0 = 0; Yaw0 = 0;
 z_cm = 50;
-struts = 1;
 
 % Chama a função para encontrar as RPMs de equilíbrio
-Rpms_equilibrio = Find_Rpms_Equilibrium(Act_Ailerons, Act_Rear, Rudder, u0, w0, p0, q0, r0, Pitch0, Roll0, Yaw0, z_cm, struts);
+Rpms_equilibrio = Find_Rpms_Equilibrium(Act_Ailerons, Act_Rear, Rudder, u_0, w_0, p0, q0, r0, Pitch0, Roll0, Yaw0, z_cm);
 fprintf("RPMs de Equilíbrio: %f\n", Rpms_equilibrio)
 
-function Rpms_equilibrium = Find_Rpms_Equilibrium(Act_Ailerons, Act_Rear, Rudder, u0, w0, p0, q0, r0, Pitch0, Roll0, Yaw0, z_cm, struts)
+function Rpms_equilibrium = Find_Rpms_Equilibrium(Act_Ailerons, Act_Rear, Rudder, u_0, w_0, p0, q0, r0, Pitch0, Roll0, Yaw0, z_cm)
     % Constantes
     g = 9.81;  % Aceleração gravitacional (m/s^2)
     rho = 1026.00; % Densidade da água (kg/m^3)
@@ -29,12 +30,12 @@ function Rpms_equilibrium = Find_Rpms_Equilibrium(Act_Ailerons, Act_Rear, Rudder
     options = optimset('Display', 'iter', 'TolFun', tolerance, 'TolX', tolerance, 'Algorithm', 'quasi-newton');
     
     % Otimização utilizando fminunc
-    Rpms_equilibrium = fminunc(@(Rpms_motor) Equilibrium_Error(Rpms_motor, Act_Ailerons, Act_Rear, Rudder, u0, w0, p0, q0, r0, Pitch0, Roll0, Yaw0, z_cm, struts, Target_Forces, Target_Moments), (Rpms_min + Rpms_max)/2, options);
+    Rpms_equilibrium = fminunc(@(Rpms_motor) Equilibrium_Error(Rpms_motor, Act_Ailerons, Act_Rear, Rudder, u_0, w_0, p0, q0, r0, Pitch0, Roll0, Yaw0, z_cm, Target_Forces, Target_Moments), (Rpms_min + Rpms_max)/2, options);
 end
 
-function error = Equilibrium_Error(Rpms_motor, Act_Ailerons, Act_Rear, Rudder, u, w, p, q, r, Pitch, Roll, Yaw, z_cm, struts, Target_Forces, Target_Moments)
+function error = Equilibrium_Error(Rpms_motor, Act_Ailerons, Act_Rear, Rudder, u, w, p, q, r, Pitch, Roll, Yaw, z_cm, Target_Forces, Target_Moments)
     % Calcula as forças e momentos usando a função SG01_Flight_Dynamics
-    [u_dot, v_dot, w_dot, p_dot, q_dot, r_dot, Pitch_dot, Roll_dot, Yaw_dot, Z_dot, Torque, ~] = SG01_Flight_Dynamics(Act_Ailerons, Act_Rear, Rudder, Rpms_motor, u, 0, w, 0, p, q, r, Pitch, Roll, Yaw, z_cm, struts);
+    [u_dot, v_dot, w_dot, p_dot, q_dot, r_dot, Pitch_dot, Roll_dot, Yaw_dot, Z_dot, Torque, ~] = SG01_Flight_Dynamics(Act_Ailerons, Act_Rear, Rudder, Rpms_motor, u, 0, w, p, q, r, Pitch, Roll, Yaw, z_cm);
     
     % Monta os vetores de forças e momentos
     Forces = [u_dot; v_dot; w_dot];

@@ -5,6 +5,9 @@ function [u_dot,v_dot,w_dot,p_dot,q_dot,r_dot,Pitch_dot,Roll_dot,Yaw_dot,Z_dot,T
 
 %%% CONSTANTES %%%
 
+struts = 1;
+wponto = 0;
+
 g = 9.81; % Gravidade (m/s^2)
 rho= 1026.00; % Densidade água salgada (kg/m^3)
 mu= 1.14E-3; % Coef. viscosidade dinâmica água salgada (Pa*s)
@@ -17,9 +20,6 @@ b = 2.400; % Span da Asa
 c = 0.30988; % Corda média da Asa
 S = 0.68757769; % Área da Asa
 S_t = 0.20158673; % Área Elevator
-
-struts = 1;
-wponto = 0;
 
 if struts == 1 % struts estendidas, distancia submersa de strut
     z_struts = 1360 - z_cm/10; % estimativa muito rough
@@ -37,55 +37,55 @@ dist_CGSG_CGASAS_Y = 0; %idealmente
 dist_CGSG_CGASAS_Z = z_struts + 1;
 
 %%% Derivadas de estabilidade e controlo %%%
-V0 = 10.285;
-u0 = cos(deg2rad(-1.31))*V0;
-w0 = sin(deg2rad(-1.31))*V0;
+V = 10.28;
+u0 = cos(deg2rad(-3.558))*V;
+w0 = sin(deg2rad(-3.558))*V;
 deltau = u - u0;
 deltaw = w - w0;
-deltaAct_Rear = 2.35 - Act_Rear;
-teta0 = -1.31;
+deltaAct_Rear = 4 - Act_Rear;
+teta0 = -3.558;
 Cw0 = (m*g*cos(teta0))/(0.5*rho*(u0^2)*S);
-Cd1 = 0.018;
+Cd1 = 0.015;
 
-CXu = -0.03380;
-CZu = -0.00166;
-CMu = 0.09677;
-CXa = 0.30449;
-CLa = 5.65160;
-CMa = -7.48898;
+CXu = -0.02440;
+CZu = -0.00701;
+CMu = 0.08341;
+CXa = 0.22694;
+CLa = 5.93757;
+CMa = -9.37193;
 CXwponto = 0;
 CLwponto = 0; % Não tenho como saber ainda
 CMwponto = 0;
-CXq = -1.10793;
-CLq = 54.02705;
-CMq = -344.98052;
-CYb = -0.11416;
-Clb = 0.10998;
-CNb = 0.17299;
-CYp = 0.20362;
-Clp = -0.74092;
-CNp = -0.42465;
-CYr = 0.35551;
-Clr = -0.20002;
-CNr = -0.53258;
-CXd_a = -0.00519;
-CYd_a = 0;
-CZd_a = 0.00046;
-Cld_a = 0.33103;
-CMd_a = 0.00124;
-CNd_a = 0.02907;
-CXd_t = -0.03699;
+CXq = -0.31325;
+CLq = 42.62028;
+CMq = -319.07598;
+CYb = -0.10815;
+Clb = 0.11373;
+CNb = 0.15492;
+CYp = 0.18263;
+Clp = -0.72524;
+CNp = -0.33702;
+CYr = 0.32068;
+Clr = -0.22191;
+CNr = -0.45556;
+CXd_a = -0.00673;
+CYd_a = 0.02042;
+CZd_a = -0.26237;
+Cld_a = 0.20542;
+CMd_a = 0.06255;
+CNd_a = -0.01074;
+CXd_t = -0.01195;
 CYd_t = 0; % meti a 0 porque não faz sentido
-CZd_t = -1.21190;
+CZd_t = -1.20579;
 Cld_t = 0;
-CMd_t = -14.27522;
+CMd_t = -13.51024;
 CNd_t = 0;
-CXd_r = -0.00023;
-CYd_r = 0.09253;
-CZd_r = 0.00011;
-Cld_r = -0.07738;
-CMd_r = 0.00146;
-CNd_r = -0.14062;
+CXd_r = -0.01692;
+CYd_r = 0.08540;
+CZd_r = -0.35782;
+Cld_r = -0.19211;
+CMd_r = 0.13566;
+CNd_r = -0.12412;
 
 %%% DERIVADAS DIMENSIONAIS DE ESTABILIDADE %%
 V = sqrt(u^2 + v^2 + w^2);
@@ -178,6 +178,7 @@ KT_p10 = 5.070;
 
 % KT function 
 KT = @(x) KT_p1*x.^9 + KT_p2*x.^8 + KT_p3*x.^7 + KT_p4*x.^6 + KT_p5*x.^5 + KT_p6*x.^4 + KT_p7*x.^3 + KT_p8*x.^2 + KT_p9*x + KT_p10;
+
  
 % Coefficients for kq 
 Kq_p1 = 2.787;
@@ -194,13 +195,14 @@ Kq_p10 = -0.689;
 % Kq function 
 Kq = @(x) Kq_p1*x.^9 + Kq_p2*x.^8 + Kq_p3*x.^7 + Kq_p4*x.^6 + Kq_p5*x.^5 + Kq_p6*x.^4 + Kq_p7*x.^3 + Kq_p8*x.^2 + Kq_p9*x + Kq_p10;
 
+ 
 Eff_p1 = -8627.603;
 Eff_p2 = 61047.137;
-Eff_p3 = -190004.846;
-Eff_p4 = 341275.624;
-Eff_p5 = -389694.485;
-Eff_p6 = 293275.527;
-Eff_p7 = -145425.792;
+Eff_p3 = -190004.847;
+Eff_p4 = 341275.626;
+Eff_p5 = -389694.487;
+Eff_p6 = 293275.528;
+Eff_p7 = -145425.793;
 Eff_p8 = 45806.430;
 Eff_p9 = -8313.959;
 Eff_p10 = 662.694;
@@ -287,4 +289,8 @@ w_dot = uvw_dot(3);
 
 Z_dot = VI_dot(3);
 
+%  disp(Tau);
+%  disp(F);
+
+%  fprintf("%f %f %f %f %f %f %f %f %f %f %f %f",u_dot,v_dot,w_dot,p_dot,q_dot,r_dot,Pitch_dot,Roll_dot,Yaw_dot,Z_dot,Torque,Rpms_motor)
 end

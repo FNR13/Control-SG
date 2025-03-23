@@ -12,15 +12,15 @@ clear
 
 % function [] = trim_boat_SG(initial_uspeed,initial_Z)
 
-initial_uspeed = 10.285;
+initial_uspeed = 10.28;
 initial_Z = -50;
-initial_Pitch = -1.31;
+initial_Pitch = -3.558;
 
 foilborn = 1;
 
 aileron = 0;
-rear = 2.35;
-Rpms_motor = 4651.4;
+rear = 4;
+Rpms_motor = 4650;
 rudder = 0;
 
 % wait bar
