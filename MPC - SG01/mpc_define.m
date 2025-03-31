@@ -107,6 +107,6 @@ mpcobj.Model.Nominal.Y = [initial_ROLL,initial_Z];
 
 controller_state = mpcstate(mpcobj);
 % mpcDesigner(mpcobj)
-noise_model = mpcobj.getoutdist
+% noise_model = mpcobj.getoutdist
 
 save('controller.mat','mpcobj','controller_state')

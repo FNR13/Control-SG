@@ -16,7 +16,7 @@ clear
 % before linearizing the inputs and outputs must be chosen on the model
 % get operating point before linearizing
 
-load('trim_op_fixed_v.mat')
+load('matfiles/trim_op_fixed_v.mat')
 
 % close and open model to call callbacks
 model = 'SG_model';
@@ -40,7 +40,7 @@ C = lin_model.C;
 D = lin_model.D;
 
 % save('linear_model_p.mat','lin_model_p','initial_uspeed')
-save('MatFiles/linear_model.mat','lin_model','initial_uspeed')
+save('matfiles/linear_model.mat','lin_model','initial_uspeed')
 
 % Controlability: rank must be equal to dim of model
 Co = ctrb(lin_model);
