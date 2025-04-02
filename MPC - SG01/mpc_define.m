@@ -1,3 +1,5 @@
+clc
+clear
 %% Defining mpc object
 
 % mpcobj = mpc(plant,ts,P,M,W,MV,OV,DV);
@@ -45,11 +47,11 @@ M = 10; % N steps of control
 W = struct();
 
 % Respectively - aileron and rear foil
-W.ManipulatedVariables = [1 1];  % Weights for the 2 MVs
-W.ManipulatedVariablesRate = [10 10];  % Weights for rate of change of the 2 MVs
+W.ManipulatedVariables = [1 2.5];  % Weights for the 2 MVs
+W.ManipulatedVariablesRate = [1 1];  % Weights for rate of change of the 2 MVs
 
 % Respectively - roll height
-W.OutputVariables = [100 100];  % Weights for the 2 MOs
+W.OutputVariables = [1000 1];  % Weights for the 2 MOs
 
 %% Defining Constraints
 % Manipulated variables properties
@@ -60,13 +62,13 @@ max_aileron_rate = 5; % max angle of attack rate
 
 minAOA_rear = -3; 
 maxAOA_rear = 15; 
-min_rear_rate = -5; % min angle of attack rate
-max_rear_rate = 5; % max angle of attack rate
+min_rear_rate = -2.5; % min angle of attack rate
+max_rear_rate = 2.5; % max angle of attack rate
 
 % Operating point conditions
 
-MV(1) = struct('Min', min_ailerons, 'Max', max_ailerons, 'RateMin', min_aileron_rate, 'RateMax', max_aileron_rate, 'ScaleFactor', 1);
-MV(2) = struct('Min', minAOA_rear, 'Max', maxAOA_rear, 'RateMin', min_rear_rate, 'RateMax', max_rear_rate, 'ScaleFactor', 1);
+MV(1) = struct('Min', min_ailerons, 'Max', max_ailerons, 'RateMin', min_aileron_rate*ts, 'RateMax', max_aileron_rate*ts, 'ScaleFactor', 1);
+MV(2) = struct('Min', minAOA_rear, 'Max', maxAOA_rear, 'RateMin', min_rear_rate*ts, 'RateMax', max_rear_rate*ts, 'ScaleFactor', 1);
 
 % Measured Outputs properties
 minTheta = -10;

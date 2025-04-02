@@ -8,7 +8,7 @@ clear
 % Pitch0 = -3.558;
 % z_cm = 50;
 
-act_ailerons = 0;
+act_ailerons = 15;
 act_rear = 4;
 T = 4650;
 Rudder = 0;
