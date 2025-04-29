@@ -26,27 +26,28 @@ clear
 load('MatFiles\linear_model.mat')
 load('MatFiles\trim_op_fixed_v.mat')
 
+% Sampling Time
+ts  = 0.1;
+
 % plant = LTI_model;
-plant = ss(lin_model.A, lin_model.B, lin_model.C,lin_model.D);
+discrete_model = c2d(lin_model,ts);
+plant = ss(discrete_model.A, discrete_model.B, discrete_model.C,discrete_model.D,ts);
+% plant = ss(lin_model.A, lin_model.B, lin_model.C,lin_model.D);
 plant = setmpcsignals(plant,'MV',[1 2],'MD',[3 4]);
 
 %% Define tuning parameters
 
-% Sampling Time
-ts  = 0.020;
-
 % Prediction horizon
-P = 10; % N steps of prediction
+P = 100; % N steps of prediction
 
 % Control Horizon
-M = 3; % N steps of control
-
+M = 10; % N steps of control
 
 % Control Weights
 W = struct();
 
 % Respectively - aileron and rear foil
-W.ManipulatedVariables = [1 1];  % Weights for the 2 MVs
+W.ManipulatedVariables = [1 10];  % Weights for the 2 MVs
 W.ManipulatedVariablesRate = [1 1];  % Weights for rate of change of the 2 MVs
 
 % Respectively - roll height
@@ -56,22 +57,24 @@ W.OutputVariables = [1 1];  % Weights for the 2 MOs
 % Manipulated variables properties
 min_ailerons = -15;
 max_ailerons = 15;
-min_aileron_rate = -inf; % min angle of attack rate
-max_aileron_rate = inf; % max angle of attack rate
+min_aileron_rate = -5; % min angle of attack rate
+max_aileron_rate = 5; % max angle of attack rate
 
 minAOA_rear = -3; 
 maxAOA_rear = 15; 
-min_rear_rate = -inf; % min angle of attack rate
-max_rear_rate = inf; % max angle of attack rate
+min_rear_rate = -2.5; % min angle of attack rate
+max_rear_rate = 2.5; % max angle of attack rate
 
-MV(1) = struct('Min', min_ailerons, 'Max', max_ailerons, 'RateMin', min_aileron_rate, 'RateMax', max_aileron_rate, 'ScaleFactor', 1);
-MV(2) = struct('Min', minAOA_rear, 'Max', maxAOA_rear, 'RateMin', min_rear_rate, 'RateMax', max_rear_rate, 'ScaleFactor', 1);
+% Operating point conditions
+
+MV(1) = struct('Min', min_ailerons, 'Max', max_ailerons, 'RateMin', min_aileron_rate*ts, 'RateMax', max_aileron_rate*ts, 'ScaleFactor', 1);
+MV(2) = struct('Min', minAOA_rear, 'Max', maxAOA_rear, 'RateMin', min_rear_rate*ts, 'RateMax', max_rear_rate*ts, 'ScaleFactor', 1);
 
 % Measured Outputs properties
-minTheta = -5;
-maxTheta = 5;
-minZ = -200;
-maxZ = 0;
+minTheta = -10;
+maxTheta = 10;
+minZ = 0;
+maxZ = 200;
 
 OV(1) = struct('Min', minTheta, 'Max', maxTheta, 'ScaleFactor', 1);
 OV(2) = struct('Min', minZ, 'Max', maxZ, 'ScaleFactor', 1);
@@ -106,5 +109,6 @@ mpcobj.Model.Nominal.Y = [initial_ROLL,initial_Z];
 
 controller_state = mpcstate(mpcobj);
 % mpcDesigner(mpcobj)
+% noise_model = mpcobj.getoutdist
 
-save('controller.mat','mpcobj','controller_state')
+save('controller.mat','mpcobj','controller_state','ts')
