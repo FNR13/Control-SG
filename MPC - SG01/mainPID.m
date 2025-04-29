@@ -14,7 +14,10 @@ ki_height = 0.14;
 kd_height = 0.07;
 kaw_height = 0.0001;
 
-Ts = 0.020;
+
+ultrasonic_delay = 0.3;
+Ts = 0.1;
+n = round(ultrasonic_delay/Ts);
 
 min_ailerons = -15;
 max_ailerons = 15;
@@ -29,7 +32,7 @@ max_rear_rate = 2.5; % max angle of attack rate
 trim_ailerons = 0;
 trim_rear = 4;
 
-sim("MPC_test_PID.slx",60)
+sim("main_SG_PID",60)
 
 
 

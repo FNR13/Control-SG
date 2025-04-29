@@ -89,7 +89,7 @@ CNd_r = -0.12412;
 
 %%% DERIVADAS DIMENSIONAIS DE ESTABILIDADE %%
 
-beta = asin(u/V);
+beta = asin(min(u/V,1));
 alpha = atan(w/V);
 
 Xu = rho*u0*S*sin(teta0)*Cw0 + 0.5*rho*S*u0*CXu;

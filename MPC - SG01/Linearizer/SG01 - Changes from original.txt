@@ -1,6 +1,8 @@
- - Prop coeficients are explicit instead of calculated(prop calcl.m)
+- Prop coeficients are explicit instead of calculated(prop calcl.m)
 
- - w_ponto = 0;
-struts = 0
+- w_ponto = 0;
+- struts = 1
 
- - changed order of rudder and rpms
+- line 45 - deltaAct_Rear = Act_Rear - 4;
+- line 92 - asin(min(u/V,1))
+- changed order of rudder and rpms

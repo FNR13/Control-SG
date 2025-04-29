@@ -13,7 +13,7 @@ clear
 % function [] = trim_boat_SG(initial_uspeed,initial_Z)
 
 initial_uspeed = 10.28;
-initial_Z = -50;
+initial_Z = 50;
 initial_Pitch = -3.558;
 
 foilborn = 1;
@@ -56,8 +56,8 @@ maxROLL = 10;
 minYAW = -50000;
 maxYAW = 50000;
 
-minZ = -200;
-maxZ = 0;
+minZ = 0;
+maxZ = 100;
 
 % For when triming around other velocities
 % Rpms_motor = 5000*initial_uspeed;

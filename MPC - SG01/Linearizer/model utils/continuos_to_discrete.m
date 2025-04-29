@@ -3,7 +3,7 @@ clear
 
 load linear_model.mat
 
-Ts = 0.020;
+Ts = 0.1;
 discrete_model = c2d(lin_model,Ts);
 
 fprintf('// Define dynamics matrix \n')

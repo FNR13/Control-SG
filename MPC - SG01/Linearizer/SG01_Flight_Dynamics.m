@@ -1,4 +1,4 @@
-function [u_dot,v_dot,w_dot,p_dot,q_dot,r_dot,Pitch_dot,Roll_dot,Yaw_dot,Z_dot,Torque,Rpms_motor] = SG01_Flight_Dynamics(Act_Ailerons,Act_Rear,Rpms_motor,Rudder,u,v,w,p,q,r,Pitch,Roll,Yaw,z_cm)
+function [u_dot,v_dot,w_dot,p_dot,q_dot,r_dot,Pitch_dot,Roll_dot,Yaw_dot,Z_dot,Torque,Rpms_motor] = SG01_Flight_Dynamics(Act_Ailerons,Act_Rear,Rpms_motor, Rudder,u,v,w,p,q,r,Pitch,Roll,Yaw,z_cm)
 
 % Modelo Dinâmico do SG01, recebendo o estado do sistema ele retorna as
 % derivadas das velocidades da "embarcação"
@@ -42,7 +42,7 @@ u0 = cos(deg2rad(-3.558))*V;
 w0 = sin(deg2rad(-3.558))*V;
 deltau = u - u0;
 deltaw = w - w0;
-deltaAct_Rear = 4 - Act_Rear;
+deltaAct_Rear = Act_Rear - 4;
 teta0 = -3.558;
 Cw0 = (m*g*cos(teta0))/(0.5*rho*(u0^2)*S);
 Cd1 = 0.015;
@@ -88,8 +88,8 @@ CMd_r = 0.13566;
 CNd_r = -0.12412;
 
 %%% DERIVADAS DIMENSIONAIS DE ESTABILIDADE %%
-V = sqrt(u^2 + v^2 + w^2);
-beta = asin(u/V);
+
+beta = asin(min(u/V,1));
 alpha = atan(w/V);
 
 Xu = rho*u0*S*sin(teta0)*Cw0 + 0.5*rho*S*u0*CXu;
@@ -288,9 +288,4 @@ v_dot = uvw_dot(2);
 w_dot = uvw_dot(3);
 
 Z_dot = VI_dot(3);
-
-%  disp(Tau);
-%  disp(F);
-
-%  fprintf("%f %f %f %f %f %f %f %f %f %f %f %f",u_dot,v_dot,w_dot,p_dot,q_dot,r_dot,Pitch_dot,Roll_dot,Yaw_dot,Z_dot,Torque,Rpms_motor)
 end

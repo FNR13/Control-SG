@@ -47,11 +47,11 @@ M = 10; % N steps of control
 W = struct();
 
 % Respectively - aileron and rear foil
-W.ManipulatedVariables = [1 2.5];  % Weights for the 2 MVs
+W.ManipulatedVariables = [1 10];  % Weights for the 2 MVs
 W.ManipulatedVariablesRate = [1 1];  % Weights for rate of change of the 2 MVs
 
 % Respectively - roll height
-W.OutputVariables = [1000 1];  % Weights for the 2 MOs
+W.OutputVariables = [1 1];  % Weights for the 2 MOs
 
 %% Defining Constraints
 % Manipulated variables properties
@@ -73,8 +73,8 @@ MV(2) = struct('Min', minAOA_rear, 'Max', maxAOA_rear, 'RateMin', min_rear_rate*
 % Measured Outputs properties
 minTheta = -10;
 maxTheta = 10;
-minZ = -200;
-maxZ = 0;
+minZ = 0;
+maxZ = 200;
 
 OV(1) = struct('Min', minTheta, 'Max', maxTheta, 'ScaleFactor', 1);
 OV(2) = struct('Min', minZ, 'Max', maxZ, 'ScaleFactor', 1);
@@ -111,4 +111,4 @@ controller_state = mpcstate(mpcobj);
 % mpcDesigner(mpcobj)
 % noise_model = mpcobj.getoutdist
 
-save('controller.mat','mpcobj','controller_state')
+save('controller.mat','mpcobj','controller_state','ts')
