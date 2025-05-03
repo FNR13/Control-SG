@@ -13,7 +13,7 @@ load('matfiles/trim_op_fixed_v.mat');
 load('matfiles/linear_model.mat');
 
 
-ultrasonic_delay = 0.3;
+ultrasonic_delay = 0;
 n = round(ultrasonic_delay/ts);
 
 sim("main_SG_MPC")

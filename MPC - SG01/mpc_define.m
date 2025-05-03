@@ -47,10 +47,10 @@ Ch = 10; % N steps of control
 W = struct();
 
 % Respectively - roll height
-W.OutputVariables = [10 10];  % Weights for the 2 MOs
+W.OutputVariables = [1 1];  % Weights for the 2 MOs
 
 % Respectively - aileron and rear foil
-W.ManipulatedVariables = [1 1];  % Weights for the 2 MVs
+W.ManipulatedVariables = [0.5 1];  % Weights for the 2 MVs
 W.ManipulatedVariablesRate = [0 0];  % Weights for rate of change of the 2 MVs
 
 %% Defining Constraints
@@ -73,8 +73,8 @@ MV(2) = struct('Min', minAOA_rear, 'Max', maxAOA_rear, 'RateMin', min_rear_rate*
 % Measured Outputs properties
 minTheta = -10;
 maxTheta = 10;
-minZ = -0.2;
-maxZ = 2;
+minZ = -10;
+maxZ = 150;
 
 OV(1) = struct('Min', minTheta, 'Max', maxTheta, 'ScaleFactor', 1);
 OV(2) = struct('Min', minZ, 'Max', maxZ, 'ScaleFactor', 1);
