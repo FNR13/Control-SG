@@ -6,3 +6,4 @@
 - line 45 - deltaAct_Rear = Act_Rear - 4;
 - line 92 - asin(min(u/V,1))
 - changed order of rudder and rpms
+- changed z from cm to m

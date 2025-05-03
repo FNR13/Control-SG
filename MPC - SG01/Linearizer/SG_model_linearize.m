@@ -40,14 +40,14 @@ C = lin_model.C;
 D = lin_model.D;
 
 % save('linear_model_p.mat','lin_model_p','initial_uspeed')
-save('matfiles/linear_model.mat','lin_model','initial_uspeed')
+save('matfiles/linear_model.mat','lin_model')
 
 % Controlability: rank must be equal to dim of model
 Co = ctrb(lin_model);
 Co_rank = rank(Co);
 
 if Co_rank < size(lin_model.A,1)
-   error("model is not controllable");
+   disp("model is not controllable");
 end
 
 % simplify roll model to 2 states, only roll and rolldot matter
@@ -61,10 +61,10 @@ Dl = 0;
 lin_model_l = ss(Al,Bl,Cl,Dl);
 
 % Controlability: rank must be equal to dim of model
-Co = ctrb(lin_model_l);
-Co_rank = rank(Co);
-if Co_rank < size(lin_model_l.A,1)
-    error("lateral model is not controllable");
+Co_lat = ctrb(lin_model_l);
+Co_lat_rank = rank(Co_lat);
+if Co_lat_rank < size(lin_model_l.A,1)
+    disp("lateral model is not controllable");
 end
 
 

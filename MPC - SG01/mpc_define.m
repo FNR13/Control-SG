@@ -23,8 +23,8 @@ clear
 
 %% Load Linearized Model
 
-load('MatFiles\linear_model.mat')
-load('MatFiles\trim_op_fixed_v.mat')
+load('matfiles\linear_model.mat')
+load('matfiles\trim_op_fixed_v.mat')
 
 % Sampling Time
 ts  = 0.1;
@@ -38,32 +38,32 @@ plant = setmpcsignals(plant,'MV',[1 2],'MD',[3 4]);
 %% Define tuning parameters
 
 % Prediction horizon
-P = 100; % N steps of prediction
+Ph = 100; % N steps of prediction
 
 % Control Horizon
-M = 10; % N steps of control
+Ch = 10; % N steps of control
 
 % Control Weights
 W = struct();
 
-% Respectively - aileron and rear foil
-W.ManipulatedVariables = [1 10];  % Weights for the 2 MVs
-W.ManipulatedVariablesRate = [1 1];  % Weights for rate of change of the 2 MVs
-
 % Respectively - roll height
-W.OutputVariables = [1 1];  % Weights for the 2 MOs
+W.OutputVariables = [10 10];  % Weights for the 2 MOs
+
+% Respectively - aileron and rear foil
+W.ManipulatedVariables = [1 1];  % Weights for the 2 MVs
+W.ManipulatedVariablesRate = [0 0];  % Weights for rate of change of the 2 MVs
 
 %% Defining Constraints
 % Manipulated variables properties
 min_ailerons = -15;
 max_ailerons = 15;
-min_aileron_rate = -5; % min angle of attack rate
-max_aileron_rate = 5; % max angle of attack rate
+min_aileron_rate = -99; % min angle of attack rate
+max_aileron_rate = 99; % max angle of attack rate
 
 minAOA_rear = -3; 
 maxAOA_rear = 15; 
-min_rear_rate = -2.5; % min angle of attack rate
-max_rear_rate = 2.5; % max angle of attack rate
+min_rear_rate = -99; % min angle of attack rate
+max_rear_rate = 99; % max angle of attack rate
 
 % Operating point conditions
 
@@ -73,14 +73,14 @@ MV(2) = struct('Min', minAOA_rear, 'Max', maxAOA_rear, 'RateMin', min_rear_rate*
 % Measured Outputs properties
 minTheta = -10;
 maxTheta = 10;
-minZ = 0;
-maxZ = 200;
+minZ = -0.2;
+maxZ = 2;
 
 OV(1) = struct('Min', minTheta, 'Max', maxTheta, 'ScaleFactor', 1);
 OV(2) = struct('Min', minZ, 'Max', maxZ, 'ScaleFactor', 1);
 
 %% Create MPC object
-mpcobj = mpc(plant, ts, P, M, W, MV, OV);
+mpcobj = mpc(plant, ts, Ph, Ch, W, MV, OV);
 
 % Dont use built in Kalman Filter
 setEstimator(mpcobj,"custom")
@@ -95,10 +95,12 @@ setname(mpcobj,'Output',1,'Roll')
 setname(mpcobj,'Output',2,'Heave')
 
 % Set Initial Condition
-
-state = [initial_uspeed,initial_vspeed,initial_wspeed,...
-         initial_P, initial_P,initial_P,...
-         initial_Pitch,initial_ROLL,initial_Z];
+state = [
+    initial_uspeed, initial_vspeed, initial_wspeed,...
+    initial_P, initial_Q, initial_R,...
+    initial_Pitch, initial_ROLL,...
+    initial_Z
+        ];
 
 initial_MV = [act_ailerons,act_rear];
 disturbances = [T, gg];
@@ -108,6 +110,16 @@ mpcobj.Model.Nominal.U = [initial_MV,disturbances];
 mpcobj.Model.Nominal.Y = [initial_ROLL,initial_Z];
 
 controller_state = mpcstate(mpcobj);
+
+% Otimization parameters (so in c++ code is the same)
+% n = 4 x (n_c + n_v) // default
+n_v = 2 * Ch; % Manipualted Variable * Control Horizon
+n_c = 4 * Ph; % (Output Constraints) * Prediction Horizon
+n = 4 * (n_v + n_c);
+
+mpcobj.Optimizer.SolverOptions.MaxIterations = n;
+mpcobj.Optimizer.SolverOptions.ConstraintTolerance = 1e-6; % default
+
 % mpcDesigner(mpcobj)
 % noise_model = mpcobj.getoutdist
 

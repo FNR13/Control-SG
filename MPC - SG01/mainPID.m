@@ -2,7 +2,7 @@ clc
 clear
 
 
-load('MatFiles/trim_op_fixed_v.mat');
+load('matfiles/trim_op_fixed_v.mat');
 
 kp_roll = 4.3;
 ki_roll = 1.4;
