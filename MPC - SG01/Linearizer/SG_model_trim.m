@@ -12,7 +12,8 @@ clear
 
 % function [] = trim_boat_SG(initial_uspeed,initial_Z)
 
-initial_uspeed = 10.26;
+initial_uspeed = cos(deg2rad(-3.558))*10.275;
+initial_wspeed = sin(deg2rad(-3.558))*10.275;
 initial_Z = 100;
 initial_Pitch = -3.558;
 
@@ -20,7 +21,7 @@ foilborn = 1;
 
 aileron = 0;
 rear = 4;
-Rpms_motor = 4650;
+Rpms_motor = 2679.2979205956;
 rudder = 0;
 
 % wait bar
@@ -81,7 +82,7 @@ maxZ = 150;
 
 
 %% Set initial conditions
-x0 = [initial_uspeed; 0;0;0;0;0;initial_Pitch;0;0; initial_Z];
+x0 = [initial_uspeed; 0;initial_wspeed;0;0;0;initial_Pitch;0;0; initial_Z];
 u0 = [aileron; rear; Rpms_motor;rudder];
 y0 = [0 0 0 0 0 0 0 0];
 % create constants for simulink model

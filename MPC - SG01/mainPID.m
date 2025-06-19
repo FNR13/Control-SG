@@ -4,14 +4,14 @@ clear
 
 load('matfiles/trim_op_fixed_v.mat');
 
-kp_roll = 4.3;
-ki_roll = 1.4;
-kd_roll = 0.7;
-kaw_roll = 0.06;
+kp_roll = 2;
+ki_roll = 1;
+kd_roll = 0.1;
+kaw_roll = 0.01;
 
-kp_height = 0.43;
-ki_height = 0.14;
-kd_height = 0.07;
+kp_height = 0.2;
+ki_height = 0.1;
+kd_height = 0.3;
 kaw_height = 0.0001;
 
 
@@ -32,7 +32,7 @@ max_rear_rate = 2.5; % max angle of attack rate
 trim_ailerons = 0;
 trim_rear = 4;
 
-sim("main_SG_PID",60)
+sim("main_SG_PID")
 
 
 

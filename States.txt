@@ -11,7 +11,7 @@
 9 - Yaw
 10 - Z
 
-(yaw vai de cona) ficam 9 estados
+(yaw desaparece) ficam 9 estados
 Longitudinal
 
 Lateral 

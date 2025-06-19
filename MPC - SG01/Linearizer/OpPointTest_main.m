@@ -1,5 +1,5 @@
-clc
-clear
+%clc
+%clear
 
 % Act_Ailerons = 0;
 % Act_Rear = 4;
@@ -8,14 +8,14 @@ clear
 % Pitch0 = -3.558;
 % z_cm = 50;
 
-act_ailerons = 15;
-act_rear = 7;
-T = 4650;
+act_ailerons = 0;
+act_rear = 4;
+T = 2679.2979205956;
 Rudder = 0;
 
-initial_uspeed = 10.26; % 10.28
+initial_uspeed = cos(deg2rad(-3.558))*10.275;
 initial_vspeed = 0;
-initial_wspeed = -0.6383;
+initial_wspeed = sin(deg2rad(-3.558))*10.275;
 
 initial_P = 0;
 initial_Q = 0;

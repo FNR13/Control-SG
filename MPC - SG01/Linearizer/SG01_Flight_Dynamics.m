@@ -22,7 +22,7 @@ S = 0.68757769; % Área da Asa
 S_t = 0.20158673; % Área Elevator
 
 if struts == 1 % struts estendidas, distancia submersa de strut
-    z_struts = 1360 - z_cm/10; % estimativa muito rough
+    z_struts = 1360 - z_cm/100; % estimativa muito rough
 else
     z_struts = 0; % struts não estendidas INCLUIR AQUI TAMBÉM DIFERENTES DERIVADAS NO FUTURO
 end
@@ -37,13 +37,17 @@ dist_CGSG_CGASAS_Y = 0; %idealmente
 dist_CGSG_CGASAS_Z = z_struts + 1;
 
 %%% Derivadas de estabilidade e controlo %%%
-V = 10.28;
-u0 = cos(deg2rad(-3.558))*V;
-w0 = sin(deg2rad(-3.558))*V;
+V = 10.275;
+teta0 = deg2rad(-3.558);
+
+u0 = cos(teta0)*V;
+w0 = sin(teta0)*V;
+V0 = sqrt(u0^2+w0^2);
+
 deltau = u - u0;
 deltaw = w - w0;
 deltaAct_Rear = Act_Rear - 4;
-teta0 = -3.558;
+
 Cw0 = (m*g*cos(teta0))/(0.5*rho*(u0^2)*S);
 Cd1 = 0.015;
 
@@ -90,6 +94,7 @@ CNd_r = -0.12412;
 %%% DERIVADAS DIMENSIONAIS DE ESTABILIDADE %%
 
 beta = asin(min(u/V,1));
+
 alpha = atan(w/V);
 
 Xu = rho*u0*S*sin(teta0)*Cw0 + 0.5*rho*S*u0*CXu;
@@ -161,8 +166,12 @@ Nd_r = 0.5*rho*u0*u0*S*beta*CNd_r;
 
 %%% THRUST %%%
 
-Rpms_propeller = Rpms_motor/3;
-diam = 0.335;
+Rpms_propeller = Rpms_motor/1.75;
+diam = 0.35;
+drag = 0.5*rho*(V^2)*S*Cd1/0.4; %fator de 0.4 porque xflr5 e cfd
+RPM0 = 60*sqrt(drag/(rho*0.1393*diam^4));
+RPMM0 = 1.75*RPM0;
+J0 = 60*V0/(RPM0*diam);
 
 % Coefficients for KT 
 KT_p1 = -39.575;
@@ -217,10 +226,21 @@ eff = Eff(js);
 
 T = rho*(Rpms_propeller/60)^2*diam^4*kt;
 P_propeller = T*V/eff;
-
 %Calculate Power usage
 P_mec=P_propeller/0.8;
 Torque=P_mec/(Rpms_motor*2*pi/60);
+
+deltaJ = 0.00001;  % passo pequeno, ajustável conforme precisão desejada
+
+KT_plus  = KT(J0 + deltaJ);
+KT_minus = KT(J0 - deltaJ);
+
+dKT_dJ = (KT_plus - KT_minus) / (2 * deltaJ);
+
+
+T_N = rho*diam^4*dKT_dJ*(-60*V0/(RPM0*diam))/30;
+T_V = rho*(RPM0/60)^2*diam^4*dKT_dJ*60/(RPM0*diam);
+deltaT = T_N*(Rpms_propeller - RPM0) + T_V*(V-V0);
 
 %%% SOMATÓRIO %%%
 
@@ -232,12 +252,12 @@ M = du(3)*deltau + dw(3)*deltaw + dwponto(3)*wponto + dq(3)*q + Md_a*Act_Aileron
 N = dv(3)*v + dp(3)*p + dr(3)*r + Nd_a*Act_Ailerons + Nd_t*Act_Rear + Nd_r*Rudder;
 
 %d = [dist_CGSG_CGASAS_X ; dist_CGSG_CGASAS_Y ; dist_CGSG_CGASAS_Z];
-F = [X + T ; Y ; Z];
+F = [X + deltaT ; Y ; Z];
 %M_1 = cross(d,F); não é necessário porque forças já estão no CG
 
 M_2 = [L ; M ; N];
 
-M_T = [0 ; 2.6 * T; 0]; % Momento só do Thrust, confia
+M_T = [0 ; 2.6 * deltaT; 0]; % Momento só do Thrust, confia
 Tau = M_2 + M_T; % Momentos livres + Momentos das Forças no CG do SG
 
 
@@ -248,9 +268,9 @@ R = [cosd(Pitch)*cosd(Yaw) cosd(Pitch)*sind(Yaw) -sind(Pitch);
     cosd(Roll)*sind(Pitch)*cosd(Yaw)+sind(Roll)*sind(Yaw) cosd(Roll)*sind(Pitch)*sind(Yaw)-sind(Roll)*cosd(Yaw) cosd(Roll)*cosd(Pitch)]; % MATRIZ DE TRANSFERÊNCIA DE REFERENCIAL
 
 %Balance of forces
-p = p*pi/180;
-q = q*pi/180;
-r = r*pi/180;
+% p = p*pi/180;
+% q = q*pi/180;
+% r = r*pi/180;
 ww = [p;q;r];
 
 %W_inertial = m*g*[0;0;1];
@@ -264,9 +284,11 @@ Q = [1 sind(Roll)*tand(Pitch) cosd(Roll)*tand(Pitch);
      0 cosd(Roll) -sind(Roll);
      0 sind(Roll)/cosd(Pitch) cosd(Roll)/cosd(Pitch)];
 eul = Q*ww;
-Roll_dot = eul(1);
+
+eul = eul * 180/pi;
+Roll_dot  = eul(1);
 Pitch_dot = eul(2);
-Yaw_dot = eul(3);
+Yaw_dot   = eul(3);
 
 %Balance of moments
 
@@ -279,9 +301,10 @@ invJ = [-Izz/(Ixz^2 - Ixx*Izz),     0,  Ixz/(Ixz^2 - Ixx*Izz);
 
 wdot = invJ*(Tau - cross(ww,J*ww));
 
-p_dot = wdot(1)*180/pi;
-q_dot = wdot(2)*180/pi;
-r_dot = wdot(3)*180/pi;
+% wdot = wdot * 180/pi;
+p_dot = wdot(1);
+q_dot = wdot(2);
+r_dot = wdot(3);
 
 u_dot = uvw_dot(1);
 v_dot = uvw_dot(2);
