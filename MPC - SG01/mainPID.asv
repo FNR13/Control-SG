@@ -4,15 +4,15 @@ clear
 
 load('matfiles/trim_op_fixed_v.mat');
 
-kp_roll = 0.8;
-ki_roll = 0.05;
-kd_roll = 0.4;
-kaw_roll = 0.001;
+kp_roll = 1.2;
+ki_roll = 1;
+kd_roll = 0.1;
+kaw_roll = 0.01;
 
 kp_height = 0.3;
-ki_height = 0.01;
+ki_height = 0.1;
 kd_height = 0.1;
-kaw_height = 0.001;
+kaw_height = 0.0001;
 
 
 ultrasonic_delay = 0;
