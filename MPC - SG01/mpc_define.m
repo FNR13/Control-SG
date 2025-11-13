@@ -47,10 +47,10 @@ Ch = 10; % N steps of control
 W = struct();
 
 % Respectively - roll height
-W.OutputVariables = [1 1];  % Weights for the 2 MOs
+W.OutputVariables = [10 1];  % Weights for the 2 MOs
 
 % Respectively - aileron and rear foil
-W.ManipulatedVariables = [0.5 1];  % Weights for the 2 MVs
+W.ManipulatedVariables = [50 1];  % Weights for the 2 MVs
 W.ManipulatedVariablesRate = [0 0];  % Weights for rate of change of the 2 MVs
 
 %% Defining Constraints
